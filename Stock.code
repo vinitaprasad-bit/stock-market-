@@ -1,0 +1,206 @@
+81% of storage used … If you run out, you can't create, edit and upload files. Get 30 GB for ₹15 for 3 months ₹59.
+1
+100%
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+Main_Menu='''
+          -----MAIN MENU-----
+          1)Market share data analysis Import to dataframe or
+          Export to CSV file.
+          2)Market share Data Analysis/Data Manipulation.
+          3)Market share Data Visualization.
+          4)Exit.'''
+plot_menu=''' -----PLOT MENU-----
+          1)Line plot Company Vs Target Price and Common Market Price
+          2)Bar Graph showing Sum of Target Price Share Type Wise
+          3)Barh Company Vs Target Price
+          4)Histogram of Common Market Price, Target Price, Realized Returns
+          5)Return to Main Menu'''
+Analysis_Menu='''  -----SEARCH/ADDITION/DELETION-----
+              1)Display all records.
+              2)Search records based on Selected columns.
+              3)Search records based on Type.
+              4)Search records based on Row label/Number(loc[],iloc[]).
+              5)Display details of share having maximum target price.
+              6)Display details of share having minimum common market price.
+              7)Top five records.
+              8)Last five records.
+              9)Addition of new record to the Dataframe.
+              10)Deletion of records from dataframe.
+              11)Adittion of New column Total Price to the dataframe.
+              12)Display dataframe information.
+              13)Display Description of the dataframe(Agrregate function).
+              14)Return to Main Menu.'''
+import_export_menu=''' -----IMPORT/EXPORT MENU-----
+                   1)Import CSV to Dataframe.
+                   2)Export dataframe data to CSV file.
+                   3)Return to Main Menu.'''
+
+while True:
+    print(Main_Menu)
+    ch=int(input('Enter your choice'))
+    if ch==1:
+        while True:
+            print(import_export_menu)
+            ch3=int(input('Enter your choice'))
+            if ch3==1:
+                df=pd.read_csv("F:/Projects XII-C 2023-24/Ritika-Simar   Shares Data/market share analysis.csv")
+                pd.set_option('display.expand_frame_repr',False)
+                pd.set_option('display.max_rows',51)
+                print('Content of Dataframe')
+                print(df)
+                print()
+            elif ch3==2:
+                df.to_csv('Market Share Analysis.csv',index=False,header=True)
+                print('Data Written in [Market Share Analysis.csv] file')
+            elif ch3==3:
+                print('-----BACK TO MAIN MENU-----')
+                break
+            else:
+                print('WRONG CHOICE')
+    elif ch==2:
+        while True:
+            print(Analysis_Menu)
+            ch1=int(input('Enter your Choice'))
+            if ch1==1:
+                print(df)
+                print()
+            elif ch1==2:
+                print('List of columns are')
+                for x in df.columns:
+                    print(x,end=',')
+                clist=[]
+                print()
+                while True:
+                    c=input('Enter your column name')
+                    clist.append(c)
+                    ch=input('Want to give more column names')
+                    if ch in 'nN':
+                        break
+                print('Details of selected columns')
+                print(df[clist])
+                print()
+            elif ch1==3:
+                n=input('Enter Type name')
+                df1=df[df.Type==n]
+                if df1.empty:
+                    print('Sorry NO data for this group')
+                else:
+                    print(df1)
+                    print()
+            elif ch1==4:
+                print('Available Records Number range',df.index)
+                n=int(input('Enter row number you want to display'))
+                df1=df.iloc[n]
+                if df1.empty:
+                    print('NO RECORDS FOUND')
+                else:
+                    print(df1)
+            elif ch1==5:
+                df2=df[df.Target_Price== df.Target_Price.max()]
+                if df2.empty:
+                    print('NO RECORDS FOUND')
+                else:
+                    print(df2)
+                print()
+            elif ch1==6:
+                df3=df[df.CMP== df.CMP.min()]
+                if df3.empty:
+                    print('NO RECORDS')
+                else:
+                    print(df3)
+                    print()
+            elif ch1==7:
+                print('Top Five Records')
+                print(df.head())
+                print()
+            elif ch1==8:
+                print('Last five records')
+                print(df.tail())
+                print()
+            elif ch1==9:
+                br=input('Enter Company')
+                pr=input('Enter Broker')
+                ty=input("Enter Type")
+                nq=int(input('Enter BatchNo'))
+                c=int(input('Enter ShareNo'))
+                nos=int(input('Enter Target_Price'))
+                cmp=int(input("Enter common market plaec"))
+                pf=float(input("Enter profit"))
+                rr=float(input("Realization return"))
+                df.loc[51]=[nq,br,pr,ty,c,cmp,nos,pf,rr]
+                print('RECORD INSERTED')
+            elif ch1==10:
+                n=int(input('Enter the row index to be deleted'))
+                print(df.drop(n,inplace=False))
+                print('RECORDE DELETED')
+            elif ch1==11:
+                df['Total Price']= df.Profit_Ptial + df.Target_Price + df.Realized_Returns
+                print(df[['Company','Broker','Total Price']])
+                print('COLUMN ADDED')
+            elif ch1==12:
+                print('DataFame Details')
+                print(df.info())
+                print()
+            elif ch1==13:
+                print('Descriptive Statistics')
+                print(df.describe())
+                print()
+            elif ch1==14:
+                print('BACK TO MAIN MENU')
+                break
+            else:
+                print('WRONG CHOICE')
+    elif ch==3:
+            while True:
+                print(plot_menu)
+                ch2=int(input('Enter your choice'))
+                if ch2==1:
+                    company=df.Company
+                    cmp=df.CMP
+                    target=df.Target_Price
+                    xdata=np.arange(len(company))
+                    plt.plot(xdata,cmp,marker='o',label="Common Market Price")
+                    plt.plot(xdata,target,marker='o',label="Target Price")
+                    plt.ylabel('Values',fontsize=12)
+                    plt.xlabel('Company Name',fontsize=12)
+                    plt.legend()
+                    plt.xticks(xdata,company,rotation='vertical')
+                    plt.title('Company wise Target Price and Common Market Price',fontsize=14)
+                    plt.subplots_adjust(bottom=0.3)
+                    plt.show()
+                elif ch2==2:
+                    g=df.groupby('Type')
+                    s=g.Target_Price.sum()
+                    plt.bar(s.index,s.values,color='r',label='Sum of Target Price')
+                    plt.ylabel('Sum of Target Price',fontsize=12)
+                    plt.xlabel('Share Type',fontsize=12)
+                    plt.title('Type Vs sum of Target Price')
+                    plt.legend()
+                    plt.subplots_adjust(bottom=0.15)
+                    plt.show()
+                elif ch2==3:
+                    plt.barh(df.Company,df.Target_Price,edgecolor='b')
+                    plt.ylabel('Company Name',fontsize=10)
+                    plt.xlabel('Target Price',fontsize=12)
+                    plt.title('Company Vs Target Price',fontsize=14)
+                    plt.subplots_adjust(bottom=0.065)
+                    plt.show()
+                elif ch2==4:
+                    df[['CMP','Target_Price','Realized_Returns']].hist()
+                    plt.title("Analysis of CMP, Target & Realized Returns")
+                    plt.show()
+                elif ch2==5:
+                    print('-----BACK TO MAIN MENU-----')
+                    break
+                else:
+                    print('WRONG CHOICE')
+
+    else:
+            for i in end_msg:
+                print(i,end='')
+                time.sleep(0.0001)
+            break
+                       
